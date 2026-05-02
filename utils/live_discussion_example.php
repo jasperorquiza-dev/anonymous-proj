@@ -1,7 +1,5 @@
 <?php
 require_once 'philippines_time.php';
-
-// Set headers for real-time updates
 header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
@@ -20,7 +18,6 @@ header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
         }
-        
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -29,20 +26,17 @@ header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             overflow: hidden;
         }
-        
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 20px;
             text-align: center;
         }
-        
         .header h1 {
             margin: 0;
             font-size: 2.5em;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
-        
         .live-indicator {
             display: inline-block;
             background: #ff4757;
@@ -53,17 +47,14 @@ header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
             margin-top: 10px;
             animation: pulse 2s infinite;
         }
-        
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.7; }
             100% { opacity: 1; }
         }
-        
         .discussion-area {
             padding: 20px;
         }
-        
         .message {
             background: #f8f9fa;
             border-left: 4px solid #667eea;
@@ -72,45 +63,37 @@ header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
             border-radius: 0 10px 10px 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        
         .message-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
         }
-        
         .message-author {
             font-weight: bold;
             color: #667eea;
         }
-        
         .message-time {
             font-size: 0.9em;
             color: #666;
         }
-        
         .message-content {
             line-height: 1.6;
         }
-        
         .new-message-form {
             background: #f8f9fa;
             padding: 20px;
             border-top: 1px solid #eee;
         }
-        
         .form-group {
             margin-bottom: 15px;
         }
-        
         .form-group label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
             color: #333;
         }
-        
         .form-group input,
         .form-group textarea {
             width: 100%;
@@ -120,13 +103,11 @@ header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
             font-size: 16px;
             transition: border-color 0.3s;
         }
-        
         .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
             border-color: #667eea;
         }
-        
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -137,11 +118,9 @@ header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
             font-size: 16px;
             transition: transform 0.2s;
         }
-        
         .btn:hover {
             transform: translateY(-2px);
         }
-        
         .status-bar {
             background: #e9ecef;
             padding: 10px 20px;
@@ -149,7 +128,6 @@ header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
             font-size: 0.9em;
             color: #666;
         }
-        
         .online-users {
             float: right;
         }
@@ -162,7 +140,6 @@ header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
             <div class="live-indicator">🔴 LIVE</div>
             <div id="philippines-clock"></div>
         </div>
-        
         <div class="discussion-area" id="discussion-area">
             <!-- Messages will be loaded dynamically via JavaScript -->
             <div class="message">
@@ -173,7 +150,6 @@ header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
                 <div class="message-content">Welcome to our live discussion! All times are displayed in Philippines Standard Time (GMT+8).</div>
             </div>
         </div>
-        
         <div class="new-message-form">
             <form id="message-form">
                 <div class="form-group">
@@ -187,32 +163,24 @@ header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
                 <button type="submit" class="btn">Send Message</button>
             </form>
         </div>
-        
         <div class="status-bar">
             <span>Current Philippines Time: <span id="current-time"><?php echo PhilippinesTime::getHumanReadableTime(); ?></span></span>
             <span class="online-users">👥 127 users online</span>
         </div>
     </div>
-
     <!-- Include the real-time clock script -->
     <script src="realtime_clock.js"></script>
-    
     <script>
-        // Initialize the Philippines real-time clock
         const clock = new PhilippinesRealTimeClock('philippines-clock', {
             showSeconds: true,
             showDate: true,
             showTimezone: true,
             format: '12'
         });
-        
-        // Update current time display with real-time
         function updateCurrentTime() {
             const timeInfo = clock.getCurrentTime();
             document.getElementById('current-time').textContent = timeInfo.formatted + ' - ' + timeInfo.date;
         }
-        
-        // Update welcome message time with real-time
         function updateWelcomeTime() {
             const now = new Date();
             const philippinesTime = now.toLocaleString('en-US', {
@@ -227,32 +195,22 @@ header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
             });
             document.getElementById('welcome-time').textContent = philippinesTime;
         }
-        
-        // Update time every second
         setInterval(updateCurrentTime, 1000);
         setInterval(updateWelcomeTime, 1000);
         updateWelcomeTime();
-        
-        // Handle message form submission
         document.getElementById('message-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const author = document.getElementById('author').value;
             const message = document.getElementById('message').value;
-            
             if (author && message) {
                 addMessage(author, message);
                 document.getElementById('message').value = '';
             }
         });
-        
-        // Add new message to discussion
         function addMessage(author, content) {
             const discussionArea = document.getElementById('discussion-area');
             const now = new Date();
             const timestamp = now.getTime();
-            
-            // Use EXACT same logic as time_test.php
             const timeString = now.toLocaleString('en-US', {
                 timeZone: 'Asia/Manila',
                 weekday: 'short',
@@ -263,7 +221,6 @@ header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
                 minute: '2-digit',
                 hour12: true
             });
-            
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
             messageDiv.innerHTML = `
@@ -273,14 +230,9 @@ header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
                 </div>
                 <div class="message-content">${content}</div>
             `;
-            
             discussionArea.appendChild(messageDiv);
             discussionArea.scrollTop = discussionArea.scrollHeight;
         }
-        
-        // Message timestamps are now static - they show the original posting time
-        
-        // Auto-scroll to bottom when new messages arrive
         const discussionArea = document.getElementById('discussion-area');
         const observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
@@ -289,7 +241,6 @@ header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
                 }
             });
         });
-        
         observer.observe(discussionArea, { childList: true });
     </script>
 </body>

@@ -1,17 +1,12 @@
 <?php
-// maintenance_check.php - Check if forum is in maintenance mode
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 require_once '../admin/admin_functions.php';
-
 function isMaintenanceMode() {
     try {
         $pdo = getPDO();
         if (!$pdo) return false;
-        
-        // Create forum_settings table if it doesn't exist
         $pdo->exec("
             CREATE TABLE IF NOT EXISTS forum_settings (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -20,35 +15,27 @@ function isMaintenanceMode() {
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
         ");
-        
         $stmt = $pdo->prepare("SELECT setting_value FROM forum_settings WHERE setting_key = 'maintenance_mode'");
         $stmt->execute();
         $result = $stmt->fetch();
-        
         return $result && $result['setting_value'] == '1';
     } catch(PDOException $e) {
         return false;
     }
 }
-
 function getMaintenanceMessage() {
     try {
         $pdo = getPDO();
         if (!$pdo) return 'Forum is under maintenance. Please check back later.';
-        
         $stmt = $pdo->prepare("SELECT setting_value FROM forum_settings WHERE setting_key = 'maintenance_message'");
         $stmt->execute();
         $result = $stmt->fetch();
-        
         return $result ? $result['setting_value'] : 'Forum is under maintenance. Please check back later.';
     } catch(PDOException $e) {
         return 'Forum is under maintenance. Please check back later.';
     }
 }
-
-// Check maintenance mode and redirect if needed
 if (isMaintenanceMode() && !isMaster()) {
-    // Force logout all non-master users during maintenance
     if (isset($_SESSION['user_id'])) {
         $_SESSION = [];
         if (ini_get('session.use_cookies')) {
@@ -75,7 +62,6 @@ if (isMaintenanceMode() && !isMaster()) {
                 padding: 0;
                 box-sizing: border-box;
             }
-            
             body {
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                 background: #0a0e27;
@@ -86,8 +72,6 @@ if (isMaintenanceMode() && !isMaster()) {
                 overflow: hidden;
                 position: relative;
             }
-            
-            /* Animated background */
             body::before {
                 content: '';
                 position: absolute;
@@ -95,25 +79,23 @@ if (isMaintenanceMode() && !isMaster()) {
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: 
+                background:
                     radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
                     radial-gradient(circle at 80% 80%, rgba(88, 86, 214, 0.3) 0%, transparent 50%),
                     radial-gradient(circle at 40% 20%, rgba(72, 149, 239, 0.2) 0%, transparent 50%);
                 animation: gradientShift 15s ease infinite;
             }
-            
             @keyframes gradientShift {
                 0%, 100% { opacity: 1; transform: scale(1); }
                 50% { opacity: 0.8; transform: scale(1.1); }
             }
-            
             .maintenance-container {
                 background: rgba(15, 23, 42, 0.9);
                 backdrop-filter: blur(20px);
                 border: 1px solid rgba(148, 163, 184, 0.1);
                 padding: 4rem 3rem;
                 border-radius: 24px;
-                box-shadow: 
+                box-shadow:
                     0 25px 50px -12px rgba(0, 0, 0, 0.5),
                     0 0 0 1px rgba(255, 255, 255, 0.05),
                     inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
@@ -124,7 +106,6 @@ if (isMaintenanceMode() && !isMaster()) {
                 z-index: 10;
                 animation: slideUp 0.6s ease-out;
             }
-            
             @keyframes slideUp {
                 from {
                     opacity: 0;
@@ -135,14 +116,12 @@ if (isMaintenanceMode() && !isMaster()) {
                     transform: translateY(0);
                 }
             }
-            
             .maintenance-icon {
                 width: 120px;
                 height: 120px;
                 margin: 0 auto 2rem;
                 position: relative;
             }
-            
             .icon-circle {
                 width: 100%;
                 height: 100%;
@@ -155,12 +134,10 @@ if (isMaintenanceMode() && !isMaster()) {
                 animation: pulse 2s ease-in-out infinite;
                 box-shadow: 0 0 40px rgba(0, 20, 137, 0.4);
             }
-            
             @keyframes pulse {
                 0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(0, 20, 137, 0.4); }
                 50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(0, 20, 137, 0.6); }
             }
-            
             .icon-circle::before {
                 content: '';
                 position: absolute;
@@ -174,11 +151,9 @@ if (isMaintenanceMode() && !isMaster()) {
                 border-top-color: transparent;
                 animation: spin 1s linear infinite;
             }
-            
             @keyframes spin {
                 to { transform: translate(-50%, -50%) rotate(360deg); }
             }
-            
             .icon-circle::after {
                 content: '';
                 position: absolute;
@@ -190,7 +165,6 @@ if (isMaintenanceMode() && !isMaster()) {
                 background: white;
                 border-radius: 50%;
             }
-            
             .maintenance-title {
                 font-size: 2.5rem;
                 font-weight: 700;
@@ -201,7 +175,6 @@ if (isMaintenanceMode() && !isMaster()) {
                 margin-bottom: 1rem;
                 letter-spacing: -0.02em;
             }
-            
             .maintenance-subtitle {
                 font-size: 1.1rem;
                 color: #94a3b8;
@@ -210,7 +183,6 @@ if (isMaintenanceMode() && !isMaster()) {
                 letter-spacing: 0.02em;
                 text-transform: uppercase;
             }
-            
             .maintenance-message {
                 color: #cbd5e1;
                 line-height: 1.8;
@@ -220,14 +192,12 @@ if (isMaintenanceMode() && !isMaster()) {
                 margin-left: auto;
                 margin-right: auto;
             }
-            
             .button-group {
                 display: flex;
                 gap: 1rem;
                 justify-content: center;
                 flex-wrap: wrap;
             }
-            
             .refresh-btn {
                 background: linear-gradient(135deg, #001489 0%, #c8102e 100%);
                 color: white;
@@ -242,7 +212,6 @@ if (isMaintenanceMode() && !isMaster()) {
                 position: relative;
                 overflow: hidden;
             }
-            
             .refresh-btn::before {
                 content: '';
                 position: absolute;
@@ -253,20 +222,16 @@ if (isMaintenanceMode() && !isMaster()) {
                 background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
                 transition: left 0.5s;
             }
-            
             .refresh-btn:hover::before {
                 left: 100%;
             }
-            
             .refresh-btn:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 6px 25px rgba(0, 20, 137, 0.6);
             }
-            
             .refresh-btn:active {
                 transform: translateY(0);
             }
-            
             .status-indicator {
                 display: inline-flex;
                 align-items: center;
@@ -280,7 +245,6 @@ if (isMaintenanceMode() && !isMaster()) {
                 font-size: 0.9rem;
                 font-weight: 500;
             }
-            
             .status-dot {
                 width: 8px;
                 height: 8px;
@@ -288,13 +252,10 @@ if (isMaintenanceMode() && !isMaster()) {
                 border-radius: 50%;
                 animation: blink 2s ease-in-out infinite;
             }
-            
             @keyframes blink {
                 0%, 100% { opacity: 1; }
                 50% { opacity: 0.3; }
             }
-            
-            /* Floating particles */
             .particle {
                 position: absolute;
                 width: 4px;
@@ -303,14 +264,12 @@ if (isMaintenanceMode() && !isMaster()) {
                 border-radius: 50%;
                 animation: float 20s infinite;
             }
-            
             @keyframes float {
                 0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
                 10% { opacity: 1; }
                 90% { opacity: 1; }
                 100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
             }
-            
             .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
             .particle:nth-child(2) { left: 20%; animation-delay: 2s; }
             .particle:nth-child(3) { left: 30%; animation-delay: 4s; }
@@ -320,7 +279,6 @@ if (isMaintenanceMode() && !isMaster()) {
             .particle:nth-child(7) { left: 70%; animation-delay: 12s; }
             .particle:nth-child(8) { left: 80%; animation-delay: 14s; }
             .particle:nth-child(9) { left: 90%; animation-delay: 16s; }
-            
             @media (max-width: 640px) {
                 .maintenance-container {
                     padding: 3rem 2rem;
@@ -345,20 +303,16 @@ if (isMaintenanceMode() && !isMaster()) {
         <div class="particle"></div>
         <div class="particle"></div>
         <div class="particle"></div>
-        
         <div class="maintenance-container">
             <div class="maintenance-icon">
                 <div class="icon-circle"></div>
             </div>
-            
             <h1 class="maintenance-title">Under Maintenance</h1>
             <p class="maintenance-subtitle">System Upgrade in Progress</p>
             <p class="maintenance-message"><?php echo htmlspecialchars($message); ?></p>
-            
             <div class="button-group">
                 <button class="refresh-btn" onclick="location.reload()">Refresh Page</button>
             </div>
-            
             <div class="status-indicator">
                 <span class="status-dot"></span>
                 <span>Service Temporarily Unavailable</span>

@@ -1,43 +1,25 @@
 <?php
-/**
- * Performance Monitoring System
- * Tracks application performance metrics
- */
-
 class PerformanceMonitor {
     private static $startTime = null;
     private static $checkpoints = [];
     private static $queries = [];
     private static $memoryStart = null;
-    
-    /**
-     * Start monitoring
-     */
     public static function start() {
         self::$startTime = microtime(true);
         self::$memoryStart = memory_get_usage(true);
         self::$checkpoints = [];
         self::$queries = [];
     }
-    
-    /**
-     * Add checkpoint
-     */
     public static function checkpoint($name) {
         if (self::$startTime === null) {
             self::start();
         }
-        
         self::$checkpoints[] = [
             'name' => $name,
             'time' => microtime(true) - self::$startTime,
             'memory' => memory_get_usage(true) - self::$memoryStart
         ];
     }
-    
-    /**
-     * Log database query
-     */
     public static function logQuery($query, $duration) {
         self::$queries[] = [
             'query' => $query,
@@ -45,37 +27,21 @@ class PerformanceMonitor {
             'time' => microtime(true)
         ];
     }
-    
-    /**
-     * Get execution time
-     */
     public static function getExecutionTime() {
         if (self::$startTime === null) {
             return 0;
         }
         return microtime(true) - self::$startTime;
     }
-    
-    /**
-     * Get memory usage
-     */
     public static function getMemoryUsage() {
         if (self::$memoryStart === null) {
             return memory_get_usage(true);
         }
         return memory_get_usage(true) - self::$memoryStart;
     }
-    
-    /**
-     * Get peak memory usage
-     */
     public static function getPeakMemoryUsage() {
         return memory_get_peak_usage(true);
     }
-    
-    /**
-     * Get all statistics
-     */
     public static function getStats() {
         return [
             'execution_time' => round(self::getExecutionTime() * 1000, 2) . ' ms',
@@ -87,19 +53,11 @@ class PerformanceMonitor {
             'slow_queries' => self::getSlowQueries()
         ];
     }
-    
-    /**
-     * Get slow queries (>100ms)
-     */
     private static function getSlowQueries($threshold = 0.1) {
         return array_filter(self::$queries, function($query) use ($threshold) {
             return $query['duration'] > $threshold;
         });
     }
-    
-    /**
-     * Format bytes
-     */
     private static function formatBytes($bytes) {
         $units = ['B', 'KB', 'MB', 'GB'];
         $bytes = max($bytes, 0);
@@ -108,23 +66,16 @@ class PerformanceMonitor {
         $bytes /= pow(1024, $pow);
         return round($bytes, 2) . ' ' . $units[$pow];
     }
-    
-    /**
-     * Display performance report
-     */
     public static function report($return = false) {
         $stats = self::getStats();
-        
         $output = "\n<!-- Performance Report -->\n";
         $output .= "<!-- Execution Time: {$stats['execution_time']} -->\n";
         $output .= "<!-- Memory Usage: {$stats['memory_usage']} -->\n";
         $output .= "<!-- Peak Memory: {$stats['peak_memory']} -->\n";
         $output .= "<!-- Total Queries: {$stats['total_queries']} -->\n";
-        
         if (!empty($stats['slow_queries'])) {
             $output .= "<!-- Slow Queries: " . count($stats['slow_queries']) . " -->\n";
         }
-        
         if (!empty(self::$checkpoints)) {
             $output .= "<!-- Checkpoints:\n";
             foreach (self::$checkpoints as $cp) {
@@ -132,30 +83,19 @@ class PerformanceMonitor {
             }
             $output .= "-->\n";
         }
-        
         if ($return) {
             return $output;
         }
-        
         echo $output;
     }
-    
-    /**
-     * Save performance log
-     */
     public static function saveLog($category = 'performance') {
         require_once '../core/logger.php';
-        
         $stats = self::getStats();
         Logger::info('Performance metrics', $stats, $category);
     }
 }
-
-// Auto-start monitoring if in development
 if (defined('APP_ENV') && APP_ENV === 'development') {
     PerformanceMonitor::start();
-    
-    // Auto-report at shutdown
     register_shutdown_function(function() {
         if (defined('APP_ENV') && APP_ENV === 'development') {
             PerformanceMonitor::report();

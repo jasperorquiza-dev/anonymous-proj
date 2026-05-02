@@ -1,5 +1,4 @@
 <?php
-// debug_time.php - Debug time display issues
 require_once 'philippines_time.php';
 ?>
 <!DOCTYPE html>
@@ -18,13 +17,11 @@ require_once 'philippines_time.php';
 </head>
 <body>
     <h1>Time Display Debug</h1>
-    
     <div class="debug-box working">
         <h3>✅ Working Time (from time_test.php logic)</h3>
         <p><strong>PHP Server Time:</strong> <?php echo PhilippinesTime::getHumanReadableTime(); ?></p>
         <p><strong>Formatted:</strong> <?php echo PhilippinesTime::getCurrentTime(); ?></p>
     </div>
-    
     <div class="debug-box test">
         <h3>🧪 Test Message Time Display</h3>
         <div id="test-message">
@@ -37,15 +34,12 @@ require_once 'philippines_time.php';
             </div>
         </div>
     </div>
-    
     <div class="debug-box test">
         <h3>🧪 Test Current Time Display</h3>
         <p><strong>Current Time (JavaScript):</strong> <span id="current-time">Loading...</span></p>
         <p><strong>Message Time (JavaScript):</strong> <span id="message-time">Loading...</span></p>
     </div>
-
     <script>
-        // Test 1: Current time display (like time_test.php)
         function updateCurrentTime() {
             const now = new Date();
             const timeString = now.toLocaleString('en-US', {
@@ -60,10 +54,7 @@ require_once 'philippines_time.php';
             });
             document.getElementById('current-time').textContent = timeString;
         }
-        
-        // Test 2: Message time display (like dashboard)
         function updateMessageTime() {
-            // Simulate a message created 5 minutes ago
             const messageTime = new Date(Date.now() - 5 * 60 * 1000);
             const timeString = messageTime.toLocaleString('en-US', {
                 timeZone: 'Asia/Manila',
@@ -78,12 +69,8 @@ require_once 'philippines_time.php';
             document.getElementById('message-time').textContent = timeString;
             document.getElementById('test-time').textContent = timeString;
         }
-        
-        // Update immediately
         updateCurrentTime();
         updateMessageTime();
-        
-        // Update every second
         setInterval(updateCurrentTime, 1000);
         setInterval(updateMessageTime, 1000);
     </script>

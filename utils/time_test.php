@@ -45,42 +45,34 @@ require_once 'philippines_time.php';
 </head>
 <body>
     <h1>Philippines Time Test</h1>
-    
     <div class="time-display server-time">
         <h2>Server Time (PHP)</h2>
         <div class="time-value"><?php echo PhilippinesTime::getHumanReadableTime(); ?></div>
         <div>Formatted: <?php echo PhilippinesTime::getCurrentTime(); ?></div>
         <div>ISO: <?php echo PhilippinesTime::now()->format('c'); ?></div>
     </div>
-    
     <div class="time-display client-time">
         <h2>Client Time (JavaScript)</h2>
         <div class="time-value" id="client-time"></div>
         <div id="client-formatted"></div>
         <div id="client-iso"></div>
     </div>
-    
     <div class="time-display live-clock">
         <h2>Live Clock</h2>
         <div id="philippines-clock"></div>
     </div>
-    
     <div class="time-display">
         <h2>Server API Response</h2>
         <pre id="api-response"></pre>
     </div>
-
     <script src="realtime_clock.js"></script>
     <script>
-        // Initialize the Philippines real-time clock
         const clock = new PhilippinesRealTimeClock('philippines-clock', {
             showSeconds: true,
             showDate: true,
             showTimezone: true,
             format: '12'
         });
-        
-        // Display client time
         function updateClientTime() {
             const now = new Date();
             document.getElementById('client-time').textContent = now.toLocaleString('en-US', {
@@ -94,7 +86,6 @@ require_once 'philippines_time.php';
                 second: '2-digit',
                 hour12: true
             });
-            
             document.getElementById('client-formatted').textContent = 'Formatted: ' + now.toLocaleString('en-US', {
                 timeZone: 'Asia/Manila',
                 year: 'numeric',
@@ -105,15 +96,10 @@ require_once 'philippines_time.php';
                 second: '2-digit',
                 hour12: false
             });
-            
             document.getElementById('client-iso').textContent = 'ISO: ' + now.toISOString();
         }
-        
-        // Update client time every second
         setInterval(updateClientTime, 1000);
         updateClientTime();
-        
-        // Test API response
         fetch('philippines_time.php?action=get_time')
             .then(response => response.json())
             .then(data => {

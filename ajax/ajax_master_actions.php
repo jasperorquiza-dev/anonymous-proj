@@ -1,25 +1,19 @@
 <?php
-// ajax_master_actions.php - Handle all master dashboard actions
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 require_once '../master/master_auth.php';
 require_once '../admin/admin_functions.php';
-
 if (!isMaster()) {
     echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
     exit;
 }
-
 $action = $_POST['action'] ?? '';
-
 try {
     $pdo = getPDO();
     if (!$pdo) {
         throw new Exception('Database connection failed');
     }
-
     switch ($action) {
         case 'promote_admin':
             $user_id = $_POST['user_id'] ?? '';
@@ -30,7 +24,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to promote user']);
             }
             break;
-
         case 'demote_admin':
             $user_id = $_POST['user_id'] ?? '';
             if (setAdminStatus($user_id, 0)) {
@@ -40,7 +33,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to demote user']);
             }
             break;
-
         case 'mute_user':
             $user_id = $_POST['user_id'] ?? '';
             $duration = $_POST['duration'] ?? 24;
@@ -51,7 +43,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to mute user']);
             }
             break;
-
         case 'unmute_user':
             $user_id = $_POST['user_id'] ?? '';
             if (unmuteUser($user_id)) {
@@ -61,7 +52,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to unmute user']);
             }
             break;
-
         case 'ban_user':
             $user_id = $_POST['user_id'] ?? '';
             $duration = $_POST['duration'] ?? null;
@@ -72,7 +62,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to ban user']);
             }
             break;
-
         case 'unban_user':
             $user_id = $_POST['user_id'] ?? '';
             if (unbanUser($user_id)) {
@@ -82,7 +71,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to unban user']);
             }
             break;
-
         case 'delete_user':
             $user_id = $_POST['user_id'] ?? '';
             if (deleteUser($user_id)) {
@@ -92,7 +80,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to delete user']);
             }
             break;
-
         case 'reset_password':
             $user_id = $_POST['user_id'] ?? '';
             $new_password = generateRandomPassword();
@@ -103,7 +90,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to reset password']);
             }
             break;
-
         case 'pin_message':
             $message_id = $_POST['message_id'] ?? '';
             if (pinMessage($message_id)) {
@@ -113,7 +99,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to pin message']);
             }
             break;
-
         case 'unpin_message':
             $message_id = $_POST['message_id'] ?? '';
             if (unpinMessage($message_id)) {
@@ -123,7 +108,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to unpin message']);
             }
             break;
-
         case 'delete_message':
             $message_id = $_POST['message_id'] ?? '';
             if (softDeleteMessage($message_id)) {
@@ -133,7 +117,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to delete message']);
             }
             break;
-
         case 'restore_message':
             $message_id = $_POST['message_id'] ?? '';
             if (restoreMessage($message_id)) {
@@ -143,7 +126,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to restore message']);
             }
             break;
-
         case 'clear_spam':
             if (clearSpamMessages()) {
                 logAdminAction('clear_spam', '', 'Spam messages cleared');
@@ -152,7 +134,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to clear spam']);
             }
             break;
-
         case 'resolve_report':
             $report_id = $_POST['report_id'] ?? '';
             if (resolveReport($report_id)) {
@@ -162,7 +143,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to resolve report']);
             }
             break;
-
         case 'dismiss_report':
             $report_id = $_POST['report_id'] ?? '';
             if (dismissReport($report_id)) {
@@ -172,7 +152,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to dismiss report']);
             }
             break;
-
         case 'ban_ip':
             $ip_address = $_POST['ip_address'] ?? '';
             if (banIPAddress($ip_address)) {
@@ -182,7 +161,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to ban IP address']);
             }
             break;
-
         case 'create_backup':
             $type = $_POST['type'] ?? 'full';
             $backup_file = createDatabaseBackup($type);
@@ -193,7 +171,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to create backup']);
             }
             break;
-
         case 'enable_maintenance':
             $message = $_POST['message'] ?? 'Forum is under maintenance. Please check back later.';
             if (enableMaintenanceMode($message)) {
@@ -203,7 +180,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to enable maintenance mode']);
             }
             break;
-
         case 'disable_maintenance':
             if (disableMaintenanceMode()) {
                 logAdminAction('disable_maintenance', '', 'Maintenance mode disabled');
@@ -212,12 +188,10 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to disable maintenance mode']);
             }
             break;
-
         default:
             echo json_encode(['status' => 'error', 'message' => 'Invalid action']);
             break;
     }
-
 } catch (Exception $e) {
     echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }

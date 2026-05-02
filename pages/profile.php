@@ -1,25 +1,18 @@
 <?php
-// profile.php - Individual user profile management
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 require_once '../core/auth.php';
 require_once '../core/database_connection.php';
 require_once '../admin/admin_functions.php';
 require_once '../master/master_auth.php';
-
-// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
 }
-
 $user_id = $_SESSION['user_id'];
 $is_master = isMaster();
-
-// If profile ID is provided, check permissions
-$profile_user_id = $user_id; // Default to current user
+$profile_user_id = $user_id;
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $requested_id = (int)$_GET['id'];
     if ($is_master) {
@@ -29,16 +22,10 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
         exit;
     }
 }
-
-// Initialize profile system
 initializeUserProfiles();
-
-// Get profile data
 $profile = getUserProfile($profile_user_id);
 $stats = getUserActivityStats($profile_user_id);
 $recent_messages = getRecentUserMessages($profile_user_id, 10);
-
-// Handle form submission
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_profile'])) {
@@ -50,17 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'show_online_status' => isset($_POST['show_online_status']) ? 1 : 0,
             'allow_messages' => isset($_POST['allow_messages']) ? 1 : 0,
         ];
-
         if (updateUserProfile($profile_user_id, $update_data)) {
             $message = 'Profile updated successfully!';
-            $profile = getUserProfile($profile_user_id); // Refresh data
+            $profile = getUserProfile($profile_user_id);
         } else {
             $message = 'Error updating profile.';
         }
     }
 }
-
-// Get user info for display
 try {
     $pdo = getPDO();
     $stmt = $pdo->prepare("SELECT name, username, is_admin, is_banned, is_muted, created_at FROM users WHERE id = ?");
@@ -69,7 +53,6 @@ try {
 } catch(PDOException $e) {
     $user_info = [];
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -95,7 +78,6 @@ try {
             --danger: #6f1d1b;
             --info: #001489;
         }
-
         html, body {
             background: var(--surface);
             color: var(--text);
@@ -103,14 +85,11 @@ try {
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-
         .forum-container {
             max-width: 1200px;
             margin: 24px auto;
             padding: 20px;
         }
-
-        /* Enhanced Header */
         .profile-header {
             background: linear-gradient(135deg, var(--surface-2), #1a1a1c);
             border: 1px solid var(--border);
@@ -122,7 +101,6 @@ try {
             gap: 24px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 40px rgba(212, 175, 55, 0.1);
         }
-
         .profile-avatar {
             width: 100px;
             height: 100px;
@@ -136,27 +114,22 @@ try {
             color: white;
             text-transform: uppercase;
         }
-
         .profile-info h1 {
             margin: 0;
             font-size: 2rem;
             font-weight: 700;
         }
-
         .profile-username {
             color: var(--muted);
             font-size: 1.1rem;
             margin: 8px 0 0 0;
         }
-
-        /* Stats Section */
         .stats-section {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 32px;
         }
-
         .stat-card {
             background: linear-gradient(135deg, var(--surface-2), #1a1a1c);
             border: 1px solid var(--border);
@@ -165,12 +138,10 @@ try {
             text-align: center;
             transition: all 0.3s ease;
         }
-
         .stat-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
         }
-
         .stat-number {
             font-size: 2rem;
             font-weight: 800;
@@ -178,7 +149,6 @@ try {
             display: block;
             margin-bottom: 8px;
         }
-
         .stat-label {
             color: var(--muted);
             font-size: 0.9rem;
@@ -186,8 +156,6 @@ try {
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
-        /* Content Sections */
         .content-section {
             background: var(--surface-2);
             border: 1px solid var(--border);
@@ -195,28 +163,22 @@ try {
             margin-bottom: 24px;
             overflow: hidden;
         }
-
         .section-header {
             background: rgba(255, 255, 255, 0.02);
             padding: 20px 24px;
             border-bottom: 1px solid var(--border);
         }
-
         .section-title {
             font-size: 1.2rem;
             font-weight: 600;
             margin: 0;
         }
-
         .section-content {
             padding: 24px;
         }
-
-        /* Form Styles */
         .form-group {
             margin-bottom: 20px;
         }
-
         .form-label {
             display: block;
             margin-bottom: 8px;
@@ -224,7 +186,6 @@ try {
             font-weight: 500;
             font-size: 0.95rem;
         }
-
         .form-input {
             width: 100%;
             padding: 12px 16px;
@@ -234,32 +195,25 @@ try {
             color: var(--text);
             font-size: 1rem;
         }
-
         .form-input:focus {
             outline: none;
             border-color: var(--master-blue);
         }
-
         .form-textarea {
             min-height: 120px;
             resize: vertical;
         }
-
         .form-select {
             background: var(--surface);
             color: var(--text);
         }
-
         .form-checkbox {
             margin-right: 8px;
         }
-
-        /* Messages Section */
         .messages-list {
             max-height: 400px;
             overflow-y: auto;
         }
-
         .message-item {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border);
@@ -267,18 +221,14 @@ try {
             padding: 16px;
             margin-bottom: 12px;
         }
-
         .message-time {
             color: var(--muted);
             font-size: 0.85rem;
             margin-bottom: 8px;
         }
-
         .message-content {
             line-height: 1.5;
         }
-
-        /* Buttons */
         .btn {
             padding: 12px 24px;
             border: 1px solid var(--border);
@@ -292,88 +242,70 @@ try {
             text-decoration: none;
             display: inline-block;
         }
-
         .btn:hover {
             border-color: #2a2a31;
             background: rgba(255, 255, 255, 0.05);
         }
-
         .btn-primary {
             background: var(--master-blue);
             border-color: var(--master-blue);
             color: white;
         }
-
         .btn-primary:hover {
             background: var(--master-blue-light);
         }
-
         .btn-success {
             background: var(--success);
             border-color: var(--success);
             color: white;
         }
-
         .btn-warning {
             background: var(--warning);
             border-color: var(--warning);
             color: white;
         }
-
         .btn-danger {
             background: var(--danger);
             border-color: var(--danger);
             color: white;
         }
-
         .btn-block {
             width: 100%;
             margin-top: 16px;
         }
-
-        /* Status badges */
         .status-badge {
             padding: 4px 12px;
             border-radius: 16px;
             font-size: 0.8rem;
             font-weight: 500;
         }
-
         .status-active { background: var(--success); color: #eafff7; }
         .status-banned { background: var(--danger); color: #ffecec; }
         .status-muted { background: var(--warning); color: #fff3c4; }
         .status-admin { background: #d4af37; color: #111; }
-
-        /* Alert messages */
         .alert {
             padding: 16px;
             border-radius: 8px;
             margin-bottom: 20px;
         }
-
         .alert-success {
             background: rgba(16, 185, 129, 0.1);
             border: 1px solid var(--success);
             color: #eafff7;
         }
-
         .alert-error {
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid var(--danger);
             color: #ffecec;
         }
-
-        /* Responsive */
         @media (max-width: 768px) {
             .profile-header {
                 flex-direction: column;
                 text-align: center;
             }
-
             .stats-section {
                 grid-template-columns: repeat(2, 1fr);
             }
-
             .forum-container {
                 padding: 16px;
             }
@@ -404,13 +336,11 @@ try {
                 </div>
             </div>
         </div>
-
         <?php if ($message): ?>
             <div class="alert alert-<?php echo strpos($message, 'Error') === false ? 'success' : 'error'; ?>">
                 <?php echo htmlspecialchars($message); ?>
             </div>
         <?php endif; ?>
-
         <!-- Stats Section -->
         <div class="stats-section">
             <div class="stat-card">
@@ -432,7 +362,6 @@ try {
                 <span class="stat-label">Member Since</span>
             </div>
         </div>
-
         <!-- Profile Settings (if viewing own profile or master) -->
         <?php if ($profile_user_id === $user_id || $is_master): ?>
             <div class="content-section">
@@ -447,20 +376,17 @@ try {
                                    value="<?php echo htmlspecialchars($profile['display_name'] ?? ''); ?>"
                                    placeholder="Your display name">
                         </div>
-
                         <div class="form-group">
                             <label class="form-label">Bio</label>
                             <textarea class="form-input form-textarea" name="bio"
                                       placeholder="Tell us about yourself..."><?php echo htmlspecialchars($profile['bio'] ?? ''); ?></textarea>
                         </div>
-
                         <div class="form-group">
                             <label class="form-label">Avatar URL</label>
                             <input type="url" class="form-input" name="avatar"
                                    value="<?php echo htmlspecialchars($profile['avatar'] ?? ''); ?>"
                                    placeholder="https://example.com/avatar.jpg">
                         </div>
-
                         <div class="form-group">
                             <label class="form-label">Profile Visibility</label>
                             <select class="form-input form-select" name="profile_visibility">
@@ -468,7 +394,6 @@ try {
                                 <option value="private" <?php echo ($profile['profile_visibility'] ?? 'public') === 'private' ? 'selected' : ''; ?>>Private</option>
                             </select>
                         </div>
-
                         <div class="form-group">
                             <label class="form-label">
                                 <input type="checkbox" class="form-checkbox" name="show_online_status" value="1"
@@ -476,7 +401,6 @@ try {
                                 Show online status
                             </label>
                         </div>
-
                         <div class="form-group">
                             <label class="form-label">
                                 <input type="checkbox" class="form-checkbox" name="allow_messages" value="1"
@@ -484,7 +408,6 @@ try {
                                 Allow direct messages
                             </label>
                         </div>
-
                         <button type="submit" name="update_profile" class="btn btn-primary btn-block">
                             Update Profile
                         </button>
@@ -492,7 +415,6 @@ try {
                 </div>
             </div>
         <?php endif; ?>
-
         <!-- Recent Messages -->
         <div class="content-section">
             <div class="section-header">
@@ -519,7 +441,6 @@ try {
                 <?php endif; ?>
             </div>
         </div>
-
         <!-- Navigation -->
         <div style="text-align: center; margin-top: 32px;">
             <a href="<?php echo $is_master ? 'user_profiles.php' : 'messages.php'; ?>" class="btn">

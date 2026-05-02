@@ -2,11 +2,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 function isLoggedIn() {
     return isset($_SESSION['user_id']);
 }
-
 function getUser() {
     if (isLoggedIn()) {
         return [
@@ -17,19 +15,16 @@ function getUser() {
     }
     return null;
 }
-
 function redirectIfNotLoggedIn() {
     if (!isLoggedIn()) {
         header('Location: ../pages/login.php');
         exit;
     }
 }
-
 function checkIfBanned() {
     if (isLoggedIn()) {
         require_once '../admin/admin_functions.php';
         $user_id = $_SESSION['user_id'];
-        
         if (isUserBanned($user_id)) {
             session_destroy();
             header('Location: ../pages/login.php?error=banned');

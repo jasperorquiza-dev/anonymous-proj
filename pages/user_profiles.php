@@ -1,29 +1,20 @@
 <?php
-// user_messages.php - Logged-in user forum
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 require_once '../core/auth.php';
 require_once '../core/database_connection.php';
 require_once '../admin/admin_functions.php';
 require_once '../core/maintenance_check.php';
 require_once '../master/master_auth.php';
-
-// Check if user is logged in, if not redirect to login
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
 }
-
-// Check if user is banned
 checkIfBanned();
-
 $user_id = $_SESSION['user_id'];
 $user_name = $_SESSION['user_name'];
 $user_username = $_SESSION['user_username'];
-
-// Get user's anonymous username
 $anonymous_username = '';
 try {
     $pdo = getPDO();
@@ -32,28 +23,20 @@ try {
     $user_data = $stmt->fetch();
     $anonymous_username = $user_data['anonymous_username'] ?? '';
 } catch(PDOException $e) {
-    // Continue without anonymous username
 }
-
-// Get existing messages for display
 $messages = [];
 try {
     $pdo = getPDO();
     $stmt = $pdo->query("SELECT id, username, message, created_at FROM messages ORDER BY created_at ASC LIMIT 50");
     $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch(PDOException $e) {
-    // Continue without messages if there's an error
 }
-
-// Check if user is admin
 $is_admin = false;
 try {
     $is_admin = isAdmin();
 } catch(Exception $e) {
     error_log("Admin check error: " . $e->getMessage());
 }
-
-// Get forum settings
 $forum_settings = getForumSettings();
 $forum_title = $forum_settings['forum_title'] ?? 'ICCT Forum';
 $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
@@ -67,7 +50,6 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
     <link rel="stylesheet" href="../assets/css/styles.css">
     <?php include '../core/system_messages.php'; ?>
     <style>
-        /* TOP NAVIGATION FOR LOGGED IN USERS */
         .top-nav-buttons {
             position: fixed;
             top: 0;
@@ -86,13 +68,11 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             opacity: 1;
             pointer-events: auto;
         }
-
         .top-nav-buttons .user-info {
             color: white;
             font-weight: 500;
             margin: 0;
         }
-
         .top-nav-buttons .admin-btn,
         .top-nav-buttons .logout-btn {
             padding: 8px 16px;
@@ -106,13 +86,11 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             text-decoration: none;
             transition: all 0.3s ease;
         }
-
         .top-nav-buttons .admin-btn:hover,
         .top-nav-buttons .logout-btn:hover {
             background: rgba(255,255,255,0.3);
             transform: translateY(-2px);
         }
-
         .admin-badge {
             background: #10B981;
             color: white;
@@ -122,12 +100,9 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             font-weight: bold;
             margin-left: 8px;
         }
-
-        /* Push content down below fixed buttons */
         .forum-container {
             padding-top: 70px;
         }
-
         .welcome-card {
             background: linear-gradient(135deg, var(--primary-blue), var(--primary-red));
             color: white;
@@ -137,7 +112,6 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             text-align: center;
             transition: all 0.4s ease;
         }
-
         .anonymous-card {
             background: #dbeafe;
             color: #1e40af;
@@ -147,22 +121,18 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             border: 1px solid #93c5fd;
             transition: all 0.4s ease;
         }
-        
         [data-theme="dark"] .anonymous-card {
             background: #1e3a8a;
             color: #dbeafe;
             border-color: #3b82f6;
         }
-        
         .anonymous-card h3 {
             margin: 0 0 0.5rem 0;
             font-size: 1.1rem;
         }
-        
         .anonymous-card p {
             margin: 0;
         }
-        
         .message-actions {
             display: flex;
             gap: 0.5rem;
@@ -170,7 +140,6 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             padding-top: 0.5rem;
             border-top: 1px solid var(--border);
         }
-        
         .delete-btn {
             background: var(--primary-red);
             color: white;
@@ -180,11 +149,9 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             cursor: pointer;
             font-size: 0.8rem;
         }
-        
         .delete-btn:hover {
             background: var(--red-light);
         }
-        
         .anonymous-notice {
             background: #fef3c7;
             color: #92400e;
@@ -195,21 +162,17 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             border: 1px solid #fcd34d;
             transition: all 0.4s ease;
         }
-        
         [data-theme="dark"] .anonymous-notice {
             background: #451a03;
             color: #fef3c7;
             border-color: #d97706;
         }
-
-        /* Simple Theme Toggle */
         .theme-toggle-container {
             position: fixed;
             bottom: 20px;
             right: 20px;
             z-index: 1000;
         }
-
         .theme-toggle {
             display: flex;
             background: var(--bg-card);
@@ -218,7 +181,6 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
         }
-
         .theme-btn {
             width: 40px;
             height: 40px;
@@ -232,23 +194,18 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             align-items: center;
             justify-content: center;
         }
-
         .theme-btn.active {
             background: linear-gradient(135deg, var(--primary-blue), var(--primary-red));
             color: white;
             transform: scale(1.1);
         }
-
         .theme-btn:hover {
             transform: scale(1.1);
         }
-        
-        /* Enhanced Navigation Bar */
         .top-nav-buttons {
             backdrop-filter: blur(20px);
             animation: slideDown 0.5s ease-out;
         }
-        
         @keyframes slideDown {
             from {
                 opacity: 0;
@@ -259,13 +216,11 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
                 transform: translateY(0);
             }
         }
-        
         .top-nav-buttons .admin-btn,
         .top-nav-buttons .logout-btn {
             position: relative;
             overflow: hidden;
         }
-        
         .top-nav-buttons .admin-btn::before,
         .top-nav-buttons .logout-btn::before {
             content: '';
@@ -277,29 +232,22 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
             transition: left 0.5s;
         }
-        
         .top-nav-buttons .admin-btn:hover::before,
         .top-nav-buttons .logout-btn:hover::before {
             left: 100%;
         }
-        
-        /* Enhanced Welcome Card */
         .welcome-card {
             animation: fadeIn 0.8s ease-out 0.2s both;
             box-shadow: 0 10px 30px rgba(0, 20, 137, 0.3);
         }
-        
         .welcome-card h3 {
             font-size: 1.5rem;
             margin-bottom: 0.75rem;
         }
-        
-        /* Enhanced Anonymous Card */
         .anonymous-card {
             animation: fadeIn 0.8s ease-out 0.4s both;
             box-shadow: 0 4px 15px rgba(0, 20, 137, 0.2);
         }
-        
         .anonymous-card strong {
             background: linear-gradient(135deg, #001489 0%, #c8102e 100%);
             -webkit-background-clip: text;
@@ -307,8 +255,6 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             -webkit-text-fill-color: transparent;
             font-size: 1.1rem;
         }
-        
-        /* Typing Indicator */
         .typing-indicator {
             display: none;
             padding: 0.5rem 1rem;
@@ -319,11 +265,9 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             color: var(--primary-blue);
             animation: pulse 1.5s ease-in-out infinite;
         }
-        
         .typing-indicator.show {
             display: block;
         }
-        
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
@@ -348,13 +292,11 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             </span>
             <a href="logout.php" class="logout-btn">Logout</a>
         </div>
-
         <!-- Header -->
         <header class="forum-header">
             <img src="<?php echo htmlspecialchars($forum_logo); ?>" alt="<?php echo htmlspecialchars($forum_title); ?> Logo" class="school-logo">
             <h1 class="forum-title"><?php echo htmlspecialchars($forum_title); ?></h1>
             <p class="forum-subtitle">Share your thoughts • Connect with peers</p>
-            
             <div class="forum-stats">
                 <div class="stat-item">
                     <div class="stat-number" id="total-messages"><?php echo count($messages); ?></div>
@@ -366,7 +308,6 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
                 </div>
             </div>
         </header>
-
         <!-- Welcome Message -->
         <div class="welcome-card">
             <h3>
@@ -388,7 +329,6 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
                 <?php endif; ?>
             </p>
         </div>
-
         <!-- Anonymous Username Card -->
         <?php if (!empty($anonymous_username)): ?>
         <div class="anonymous-card">
@@ -403,7 +343,6 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             <strong>All posts are anonymous!</strong> Your first message will generate a random username that stays with your account.
         </div>
         <?php endif; ?>
-
         <!-- Main Content -->
         <div class="forum-content">
             <!-- Messages Section -->
@@ -414,7 +353,6 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
                         Refresh
                     </button>
                 </div>
-                
                 <div id="messages-container">
                     <?php if (empty($messages)): ?>
                         <div class="empty-state">
@@ -428,8 +366,7 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
                                 <div class="message-header">
                                     <span class="message-username"><?php echo htmlspecialchars($message['username']); ?></span>
                                     <span class="message-time">
-                                        <?php 
-                                        // Use EXACT same logic as philippines_time.php
+                                        <?php
                                         $time = new DateTime($message['created_at']);
                                         $time->setTimezone(new DateTimeZone('Asia/Manila'));
                                         echo $time->format('D, M j, Y g:i A');
@@ -449,7 +386,6 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
                     <?php endif; ?>
                 </div>
             </main>
-
             <!-- Sidebar -->
             <aside class="forum-sidebar">
                 <div class="info-card">
@@ -473,7 +409,6 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
                         <?php endif; ?>
                     </p>
                 </div>
-                
                 <div class="info-card">
                     <h3>Forum Rules</h3>
                     <ul class="rules-list">
@@ -484,7 +419,6 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
                         <li>• Enjoy the conversation!</li>
                     </ul>
                 </div>
-                
                 <?php if (isMaster()): ?>
                 <div class="info-card">
                     <h3>Master Tools</h3>
@@ -519,13 +453,12 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
                 <?php endif; ?>
             </aside>
         </div>
-
         <!-- Input Section -->
         <section class="input-section">
             <form id="message-form">
-                <textarea 
-                    id="message-input" 
-                    name="message" 
+                <textarea
+                    id="message-input"
+                    name="message"
                     placeholder="Share your thoughts, questions, or feedback anonymously..."
                     maxlength="<?php echo $forum_settings['max_message_length'] ?? 500; ?>"
                     required
@@ -541,7 +474,6 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             </form>
         </section>
     </div>
-
     <!-- Theme Toggle -->
     <div class="theme-toggle-container">
         <div class="theme-toggle">
@@ -566,15 +498,12 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             </button>
         </div>
     </div>
-
     <script src="../assets/js/forum.js"></script>
     <script>
-        // Delete message function for admin
         function deleteMessage(messageId) {
             if (confirm('Are you sure you want to delete this message? This action cannot be undone.')) {
                 const formData = new FormData();
                 formData.append('message_id', messageId);
-                
                 fetch('../ajax/ajax_delete_message.php', {
                     method: 'POST',
                     body: formData
@@ -593,58 +522,38 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
                 });
             }
         }
-
-        // Refresh button functionality
         document.getElementById('refresh-btn').addEventListener('click', function() {
             location.reload();
         });
-
-        // Scroll effect for top navigation
         function initScrollEffects() {
             const topNav = document.querySelector('.top-nav-buttons');
             if (!topNav) return;
-            
             let lastScrollTop = 0;
             let isHidden = false;
-            
             window.addEventListener('scroll', function() {
                 let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                
                 if (scrollTop > lastScrollTop && scrollTop > 100 && !isHidden) {
-                    // Scroll down - hide navbar with fade
                     topNav.style.transform = 'translateY(-100%)';
                     topNav.style.opacity = '0';
                     topNav.style.pointerEvents = 'none';
                     isHidden = true;
                 } else if (scrollTop < lastScrollTop && isHidden) {
-                    // Scroll up - show navbar with fade
                     topNav.style.transform = 'translateY(0)';
                     topNav.style.opacity = '1';
                     topNav.style.pointerEvents = 'auto';
                     isHidden = false;
                 }
-                
                 if (scrollTop === 0) {
-                    // At top - ensure navbar is visible
                     topNav.style.transform = 'translateY(0)';
                     topNav.style.opacity = '1';
                     topNav.style.pointerEvents = 'auto';
                     isHidden = false;
                 }
-                
                 lastScrollTop = scrollTop;
             }, { passive: true });
         }
-
-        // Theme handled by forum.js
-
-        // Initialize everything when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            // Theme handled by forum.js
-            // Initialize scroll effects
             initScrollEffects();
-            
-            // Update online status
             fetch('../ajax/update_online_status.php');
         });
     </script>

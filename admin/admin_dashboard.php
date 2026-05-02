@@ -1,15 +1,10 @@
 <?php
-// admin_dashboard.php - Admin Dashboard with message selection
-// Only start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 require_once '../core/auth.php';
 require_once '../admin/admin_functions.php';
 require_once '../master/master_auth.php';
-
-// If master, send to master dashboard. Otherwise require admin.
 if (isMaster()) {
     header('Location: master_dashboard.php');
     exit;
@@ -18,7 +13,6 @@ if (!isAdmin()) {
     header('Location: ../pages/messages.php');
     exit;
 }
-
 $stats = getForumStats();
 $users = getAllUsers();
 $messages = getAllMessages();
@@ -32,7 +26,6 @@ $messages = getAllMessages();
     <link rel="icon" type="image/png" href="../assets/img/favicon.png">
     <link rel="stylesheet" href="../assets/css/styles.css">
     <style>
-        /* Enhanced Admin Header */
         .admin-header {
             display: flex;
             justify-content: space-between;
@@ -45,7 +38,6 @@ $messages = getAllMessages();
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
             animation: slideDown 0.6s ease-out;
         }
-        
         @keyframes slideDown {
             from {
                 opacity: 0;
@@ -56,21 +48,17 @@ $messages = getAllMessages();
                 transform: translateY(0);
             }
         }
-        
         .admin-header h1 {
             font-size: 1.75rem;
             font-weight: 700;
             margin: 0;
         }
-        
-        /* Enhanced Stats Grid */
         .admin-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2.5rem;
         }
-        
         .stat-card {
             background: var(--bg-card);
             padding: 2rem 1.5rem;
@@ -81,12 +69,10 @@ $messages = getAllMessages();
             transition: all 0.3s ease;
             animation: fadeIn 0.8s ease-out both;
         }
-        
         .stat-card:nth-child(1) { animation-delay: 0.1s; }
         .stat-card:nth-child(2) { animation-delay: 0.2s; }
         .stat-card:nth-child(3) { animation-delay: 0.3s; }
         .stat-card:nth-child(4) { animation-delay: 0.4s; }
-        
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -97,12 +83,10 @@ $messages = getAllMessages();
                 transform: translateY(0);
             }
         }
-        
         .stat-card:hover {
             transform: translateY(-5px);
             box-shadow: var(--shadow-xl);
         }
-        
         .stat-number {
             font-size: 2.5rem;
             font-weight: 800;
@@ -113,14 +97,11 @@ $messages = getAllMessages();
             display: block;
             margin-bottom: 0.5rem;
         }
-        
         .stat-label {
             color: var(--text-muted);
             font-size: 0.95rem;
             font-weight: 600;
         }
-        
-        /* Enhanced Action Buttons */
         .admin-btn {
             padding: 10px 18px;
             background: linear-gradient(135deg, var(--primary-blue), var(--primary-red));
@@ -138,7 +119,6 @@ $messages = getAllMessages();
             position: relative;
             overflow: hidden;
         }
-        
         .admin-btn::before {
             content: '';
             position: absolute;
@@ -149,28 +129,22 @@ $messages = getAllMessages();
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
             transition: left 0.5s;
         }
-        
         .admin-btn:hover::before {
             left: 100%;
         }
-        
         .admin-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
-        
         .danger-btn {
             background: linear-gradient(135deg, #ef4444, #dc2626);
         }
-        
         .warning-btn {
             background: linear-gradient(135deg, #f59e0b, #d97706);
         }
-        
         .success-btn {
             background: linear-gradient(135deg, #10b981, #059669);
         }
-        
         .users-table, .messages-table {
             width: 100%;
             background: var(--bg-card);
@@ -179,7 +153,6 @@ $messages = getAllMessages();
             box-shadow: var(--shadow);
             margin-bottom: 2rem;
         }
-        
         .table-responsive {
             width: 100%;
             overflow-x: auto;
@@ -188,7 +161,6 @@ $messages = getAllMessages();
             box-shadow: var(--shadow);
             background: var(--bg-card);
         }
-        
         .users-table th,
         .users-table td,
         .messages-table th,
@@ -197,7 +169,6 @@ $messages = getAllMessages();
             text-align: left;
             border-bottom: 1px solid var(--border);
         }
-        
         .users-table th,
         .messages-table th {
             background: linear-gradient(135deg, var(--primary-blue), var(--primary-red));
@@ -207,19 +178,15 @@ $messages = getAllMessages();
             font-size: 0.85rem;
             letter-spacing: 0.5px;
         }
-        
         .users-table tbody tr,
         .messages-table tbody tr {
             transition: all 0.2s ease;
         }
-        
         .users-table tbody tr:hover,
         .messages-table tbody tr:hover {
             background: rgba(102, 126, 234, 0.05);
             transform: scale(1.01);
         }
-        
-        /* Enhanced Status Badges */
         .status-badge {
             padding: 6px 12px;
             border-radius: 20px;
@@ -229,28 +196,23 @@ $messages = getAllMessages();
             letter-spacing: 0.5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
         .banned {
             background: linear-gradient(135deg, #fee2e2, #fecaca);
             color: #dc2626;
         }
-        
         .muted {
             background: linear-gradient(135deg, #fef3c7, #fde68a);
             color: #d97706;
         }
-        
         .admin-user {
             background: linear-gradient(135deg, #d1fae5, #a7f3d0);
             color: #065f46;
         }
-        
         .message-actions {
             display: flex;
             gap: 0.5rem;
             align-items: center;
         }
-        
         .select-all-container {
             background: var(--bg-card);
             padding: 1rem;
@@ -261,13 +223,11 @@ $messages = getAllMessages();
             align-items: center;
             box-shadow: var(--shadow);
         }
-        
         .selection-controls {
             display: flex;
             gap: 1rem;
             align-items: center;
         }
-        
         .selected-count {
             background: var(--primary-blue);
             color: white;
@@ -276,18 +236,15 @@ $messages = getAllMessages();
             font-size: 0.8rem;
             font-weight: bold;
         }
-        
         .checkbox-cell {
             width: 40px;
             text-align: center;
         }
-        
         .message-checkbox {
             width: 18px;
             height: 18px;
             cursor: pointer;
         }
-        
         .modal {
             display: none;
             position: fixed;
@@ -298,7 +255,6 @@ $messages = getAllMessages();
             height: 100%;
             background-color: rgba(0,0,0,0.5);
         }
-        
         .modal-content {
             background-color: var(--bg-card);
             margin: 10% auto;
@@ -308,7 +264,6 @@ $messages = getAllMessages();
             max-width: 400px;
             position: relative;
         }
-        
         .close {
             color: #aaa;
             float: right;
@@ -316,25 +271,20 @@ $messages = getAllMessages();
             font-weight: bold;
             cursor: pointer;
         }
-        
         .form-group {
             margin-bottom: 1rem;
         }
-        
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
         }
-        
         .form-group input, .form-group select {
             width: 100%;
             padding: 0.5rem;
             border: 1px solid var(--border);
             border-radius: 5px;
         }
-        
-        /* Responsive tweaks */
         @media (max-width: 1024px) {
             .admin-header {
                 flex-direction: column;
@@ -342,7 +292,6 @@ $messages = getAllMessages();
                 text-align: center;
             }
         }
-        
         @media (max-width: 768px) {
             .stat-card {
                 padding: 1rem;
@@ -401,7 +350,6 @@ $messages = getAllMessages();
                 <a href="logout.php" class="admin-btn danger-btn">Logout</a>
             </div>
         </div>
-
         <!-- Statistics -->
         <div class="admin-stats">
             <div class="stat-card">
@@ -421,11 +369,9 @@ $messages = getAllMessages();
                 <span class="stat-label">Muted Users</span>
             </div>
         </div>
-
         <!-- Messages Management -->
         <div style="background: var(--bg-card); padding: 2rem; border-radius: 10px; margin-bottom: 2rem;">
             <h2>Recent Messages (<?php echo count($messages); ?>)</h2>
-            
             <!-- Selection Controls -->
             <div class="select-all-container">
                 <div class="selection-controls">
@@ -440,7 +386,6 @@ $messages = getAllMessages();
                     <button class="admin-btn" onclick="clearSelection()">Clear Selection</button>
                 </div>
             </div>
-
             <?php if (!empty($messages)): ?>
             <div class="table-responsive">
             <table class="messages-table">
@@ -480,7 +425,6 @@ $messages = getAllMessages();
             <p>No messages found.</p>
             <?php endif; ?>
         </div>
-
         <!-- Users Management -->
         <div style="background: var(--bg-card); padding: 2rem; border-radius: 10px;">
             <h2>User Management (<?php echo count($users); ?> users)</h2>
@@ -499,13 +443,10 @@ $messages = getAllMessages();
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($users as $user): 
+                    <?php foreach ($users as $user):
                         $is_current_admin = ($_SESSION['user_id'] == $user['id']);
                         $status = [];
-                        
-                        // Check if user is admin (using username as fallback if is_admin column doesn't exist)
                         $is_admin_user = ($user['username'] === 'admin') || (isset($user['is_admin']) && $user['is_admin'] == 1);
-                        
                         if ($is_admin_user) {
                             $status[] = '<span class="status-badge admin-user">ADMIN</span>';
                         }
@@ -533,13 +474,11 @@ $messages = getAllMessages();
                                 <?php else: ?>
                                     <button class="admin-btn warning-btn" onclick="showBanModal(<?php echo $user['id']; ?>)">Ban</button>
                                 <?php endif; ?>
-                                
                                 <?php if (isset($user['is_muted']) && $user['is_muted'] == 1): ?>
                                     <button class="admin-btn success-btn" onclick="unmuteUser(<?php echo $user['id']; ?>)">Unmute</button>
                                 <?php else: ?>
                                     <button class="admin-btn warning-btn" onclick="muteUser(<?php echo $user['id']; ?>)">Mute</button>
                                 <?php endif; ?>
-                                
                                 <button class="admin-btn danger-btn" onclick="deleteUser(<?php echo $user['id']; ?>)">Delete</button>
                                 <?php if (isMaster()): ?>
                                     <?php if ($is_admin_user): ?>
@@ -561,7 +500,6 @@ $messages = getAllMessages();
             <p>No users found.</p>
             <?php endif; ?>
         </div>
-
         <!-- Admin Info -->
         <div style="background: var(--bg-card); padding: 2rem; border-radius: 10px; margin-top: 2rem;">
             <h2>Admin Information</h2>
@@ -577,7 +515,6 @@ $messages = getAllMessages();
             <p><strong>Note:</strong> All admin posts are still anonymous to maintain fairness.</p>
         </div>
     </div>
-
     <!-- Ban Modal -->
     <div id="banModal" class="modal">
         <div class="modal-content">
@@ -598,19 +535,13 @@ $messages = getAllMessages();
             </form>
         </div>
     </div>
-
     <script>
-        // Selection functionality
         let selectedMessages = new Set();
-        
-        // Update selected count
         function updateSelectedCount() {
             const count = selectedMessages.size;
             document.getElementById('selected-count').textContent = count + ' selected';
             document.getElementById('delete-selected').disabled = count === 0;
         }
-        
-        // Select all functionality
         document.getElementById('select-all').addEventListener('change', function(e) {
             const checkboxes = document.querySelectorAll('.message-select');
             checkboxes.forEach(checkbox => {
@@ -623,13 +554,10 @@ $messages = getAllMessages();
             });
             updateSelectedCount();
         });
-        
         document.getElementById('select-all-header').addEventListener('change', function(e) {
             document.getElementById('select-all').checked = e.target.checked;
             document.getElementById('select-all').dispatchEvent(new Event('change'));
         });
-        
-        // Individual checkbox handling
         document.addEventListener('change', function(e) {
             if (e.target.classList.contains('message-select')) {
                 const messageId = e.target.dataset.messageId;
@@ -639,16 +567,12 @@ $messages = getAllMessages();
                     selectedMessages.delete(messageId);
                 }
                 updateSelectedCount();
-                
-                // Update select all checkbox
                 const checkboxes = document.querySelectorAll('.message-select');
                 const allChecked = Array.from(checkboxes).every(cb => cb.checked);
                 document.getElementById('select-all').checked = allChecked;
                 document.getElementById('select-all-header').checked = allChecked;
             }
         });
-        
-        // Clear selection
         function clearSelection() {
             selectedMessages.clear();
             const checkboxes = document.querySelectorAll('.message-select');
@@ -659,34 +583,26 @@ $messages = getAllMessages();
             document.getElementById('select-all-header').checked = false;
             updateSelectedCount();
         }
-        
-        // Delete selected messages
         document.getElementById('delete-selected').addEventListener('click', function() {
             if (selectedMessages.size === 0) return;
-            
-            const message = selectedMessages.size === 1 
+            const message = selectedMessages.size === 1
                 ? 'Are you sure you want to delete the selected message?'
                 : `Are you sure you want to delete ${selectedMessages.size} selected messages?`;
-            
             if (confirm(message + ' This action cannot be undone.')) {
                 const messageIds = Array.from(selectedMessages);
                 deleteMultipleMessages(messageIds);
             }
         });
-        
-        // Message functions
         function deleteSingleMessage(messageId) {
             if (confirm('Are you sure you want to delete this message?')) {
                 deleteMultipleMessages([messageId]);
             }
         }
-        
         function deleteMultipleMessages(messageIds) {
             const formData = new FormData();
             messageIds.forEach(id => {
                 formData.append('message_ids[]', id);
             });
-            
             fetch('../ajax/ajax_delete_multiple_messages.php', {
                 method: 'POST',
                 body: formData
@@ -694,7 +610,7 @@ $messages = getAllMessages();
             .then(response => response.json())
             .then(result => {
                 if (result.status === 'success') {
-                    const message = messageIds.length === 1 
+                    const message = messageIds.length === 1
                         ? 'Message deleted successfully'
                         : `${messageIds.length} messages deleted successfully`;
                     showTempMessage(message, 'success');
@@ -709,22 +625,17 @@ $messages = getAllMessages();
                 showTempMessage('Network error', 'error');
             });
         }
-
-        // User management functions
         function showBanModal(userId) {
             document.getElementById('banUserId').value = userId;
             document.getElementById('banModal').style.display = 'block';
         }
-
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
         }
-
         function banUser(userId, duration = null) {
             const formData = new FormData();
             formData.append('user_id', userId);
             if (duration) formData.append('duration', duration);
-            
             fetch('../ajax/ajax_ban_user.php', {
                 method: 'POST',
                 body: formData
@@ -742,12 +653,10 @@ $messages = getAllMessages();
                 alert('Network error');
             });
         }
-
         function unbanUser(userId) {
             if (confirm('Are you sure you want to unban this user?')) {
                 const formData = new FormData();
                 formData.append('user_id', userId);
-                
                 fetch('../ajax/ajax_unban_user.php', {
                     method: 'POST',
                     body: formData
@@ -766,12 +675,10 @@ $messages = getAllMessages();
                 });
             }
         }
-
         function muteUser(userId) {
             if (confirm('Mute this user for 24 hours? They will not be able to post messages.')) {
                 const formData = new FormData();
                 formData.append('user_id', userId);
-                
                 fetch('../ajax/ajax_mute_user.php', {
                     method: 'POST',
                     body: formData
@@ -790,12 +697,10 @@ $messages = getAllMessages();
                 });
             }
         }
-
         function unmuteUser(userId) {
             if (confirm('Are you sure you want to unmute this user?')) {
                 const formData = new FormData();
                 formData.append('user_id', userId);
-                
                 fetch('../ajax/ajax_unmute_user.php', {
                     method: 'POST',
                     body: formData
@@ -814,12 +719,10 @@ $messages = getAllMessages();
                 });
             }
         }
-
         function deleteUser(userId) {
             if (confirm('WARNING: This will permanently delete the user and all their messages. This action cannot be undone!')) {
                 const formData = new FormData();
                 formData.append('user_id', userId);
-                
                 fetch('../ajax/ajax_delete_user.php', {
                     method: 'POST',
                     body: formData
@@ -838,8 +741,6 @@ $messages = getAllMessages();
                 });
             }
         }
-
-        // Ban form submission
         document.getElementById('banForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const userId = document.getElementById('banUserId').value;
@@ -847,7 +748,6 @@ $messages = getAllMessages();
             closeModal('banModal');
             banUser(userId, duration);
         });
-
         function showTempMessage(text, type) {
             const tempMsg = document.createElement('div');
             tempMsg.textContent = text;
@@ -863,15 +763,11 @@ $messages = getAllMessages();
                 z-index: 1000;
                 animation: slideIn 0.3s ease;
             `;
-            
             document.body.appendChild(tempMsg);
-            
             setTimeout(() => {
                 tempMsg.remove();
             }, 3000);
         }
-
-        // Close modal when clicking outside
         window.onclick = function(event) {
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';

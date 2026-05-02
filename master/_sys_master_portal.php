@@ -2,18 +2,13 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 require_once '../master/master_auth.php';
 require_once '../admin/admin_functions.php';
-
-// Handle logout
 if (isset($_GET['logout'])) {
     unset($_SESSION['is_master']);
     header('Location: ../pages/welcome.php');
     exit;
 }
-
-// Login form
 if (!isMaster()) {
     ?>
 <!DOCTYPE html>
@@ -66,8 +61,6 @@ if (!isMaster()) {
 <?php
     exit;
 }
-
-// Actions for admin promotion/demotion
 $action = $_POST['action'] ?? '';
 if ($action === 'set_admin' && isset($_POST['user_id'])) {
     try {
@@ -83,7 +76,6 @@ if ($action === 'set_admin' && isset($_POST['user_id'])) {
         exit;
     }
 }
-
 if ($action === 'unset_admin' && isset($_POST['user_id'])) {
     try {
         $pdo = getPDO();
@@ -98,8 +90,6 @@ if ($action === 'unset_admin' && isset($_POST['user_id'])) {
         exit;
     }
 }
-
-// Load users for display
 try {
     $pdo = getPDO();
     $users = $pdo->query("SELECT id, name, username, is_admin, created_at FROM users ORDER BY created_at DESC LIMIT 200")->fetchAll(PDO::FETCH_ASSOC);
@@ -123,7 +113,6 @@ try {
                 <a href="sys_diag.php?logout=1" class="admin-btn danger-btn">Logout</a>
             </div>
         </div>
-
         <div class="info-card">
             <h3>Users (<?php echo count($users); ?>)</h3>
             <div class="table-responsive">
@@ -158,7 +147,6 @@ try {
             </div>
         </div>
     </div>
-
     <script>
     async function toggleAdmin(userId, makeAdmin){
         const form = new FormData();
@@ -172,4 +160,3 @@ try {
     </script>
 </body>
 </html>
-

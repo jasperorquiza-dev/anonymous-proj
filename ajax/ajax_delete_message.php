@@ -1,18 +1,11 @@
 <?php
-// ajax_delete_message.php
-
-// Only start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 require_once '../admin/admin_functions.php';
-
 header('Content-Type: application/json');
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_id'])) {
     $message_id = intval($_POST['message_id']);
-    
     if (deleteMessage($message_id)) {
         echo json_encode(['status' => 'success', 'message' => 'Message deleted successfully']);
     } else {

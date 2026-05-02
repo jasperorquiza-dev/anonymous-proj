@@ -1,23 +1,18 @@
 <?php
-// ajax_save_settings.php - Save forum settings
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 require_once '../master/master_auth.php';
 require_once '../admin/admin_functions.php';
-
 if (!isMaster()) {
     echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
     exit;
 }
-
 try {
     $pdo = getPDO();
     if (!$pdo) {
         throw new Exception('Database connection failed');
     }
-
     $settings = [
         'forum_name' => $_POST['forum_name'] ?? '',
         'forum_description' => $_POST['forum_description'] ?? '',
@@ -28,19 +23,16 @@ try {
         'forum_title' => $_POST['forum_title'] ?? 'ICCT Forum',
         'forum_logo' => $_POST['forum_logo'] ?? 'assets/img/icct.jpg'
     ];
-
     foreach ($settings as $key => $value) {
         $stmt = $pdo->prepare("
-            INSERT INTO forum_settings (setting_key, setting_value) 
-            VALUES (?, ?) 
+            INSERT INTO forum_settings (setting_key, setting_value)
+            VALUES (?, ?)
             ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)
         ");
         $stmt->execute([$key, $value]);
     }
-
     logAdminAction('save_settings', '', 'Forum settings updated');
     echo json_encode(['status' => 'success', 'message' => 'Settings saved successfully']);
-
 } catch (Exception $e) {
     echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }

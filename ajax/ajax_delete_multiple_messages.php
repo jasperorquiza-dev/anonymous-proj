@@ -2,14 +2,10 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 require_once '../core/config.php';
 require_once '../admin/admin_functions.php';
 require_once '../master/master_auth.php';
-
 header('Content-Type: application/json');
-
-// Check if user is admin or master
 if (!isAdmin() && !isMaster()) {
     echo json_encode([
         'status' => 'error',
@@ -17,11 +13,8 @@ if (!isAdmin() && !isMaster()) {
     ]);
     exit();
 }
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_ids'])) {
-    // Decode JSON string to array
     $message_ids = json_decode($_POST['message_ids'], true);
-    
     if (!is_array($message_ids)) {
         echo json_encode([
             'status' => 'error',
@@ -29,12 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_ids'])) {
         ]);
         exit();
     }
-    
     $deleted_count = 0;
     $errors = [];
-    
     try {
-        // Use shared DB connection helper
         $pdo = getPDO();
         if (!$pdo) {
             echo json_encode([
@@ -43,10 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_ids'])) {
             ]);
             exit();
         }
-        
-        // Prepare delete statement
         $stmt = $pdo->prepare("DELETE FROM messages WHERE id = ?");
-        
         foreach ($message_ids as $message_id) {
             $message_id = intval($message_id);
             if ($message_id > 0) {
@@ -61,23 +48,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_ids'])) {
                 }
             }
         }
-        
         if ($deleted_count > 0) {
             echo json_encode([
-                'status' => 'success', 
+                'status' => 'success',
                 'message' => "Successfully deleted $deleted_count message(s)",
                 'deleted' => $deleted_count
             ]);
             exit();
         } else {
             echo json_encode([
-                'status' => 'error', 
+                'status' => 'error',
                 'message' => 'No messages were deleted. Messages may not exist.',
                 'errors' => $errors
             ]);
             exit();
         }
-        
     } catch (PDOException $e) {
         echo json_encode([
             'status' => 'error',
@@ -87,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_ids'])) {
     }
 } else {
     echo json_encode([
-        'status' => 'error', 
+        'status' => 'error',
         'message' => 'Invalid request - no message IDs provided'
     ]);
     exit();
