@@ -2,6 +2,10 @@
 
 A PHP-based anonymous forum system featuring real-time messaging, administrative controls, and a master portal for system management.
 
+## 🌐 Live Demo
+
+You can view the live version of this system here: [https://icct-forumjoo.fwh.is/](https://icct-forumjoo.fwh.is/)
+
 ## 🚀 Features
 
 - **Real-time Messaging**: Instant message updates using AJAX polling.
