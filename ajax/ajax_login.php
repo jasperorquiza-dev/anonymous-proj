@@ -26,8 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Master account short-circuit login
     // For security, master credentials should be stored in environment variables or database
-    $master_username = getenv('MASTER_USERNAME') ?: 'jasperlei';
-    $master_password_hash = getenv('MASTER_PASSWORD_HASH') ?: password_hash('masteraccountjasper', PASSWORD_DEFAULT);
+    $master_username = getenv('MASTER_USERNAME') ?: '';
+    $master_password_hash = getenv('MASTER_PASSWORD_HASH') ?: password_hash('', PASSWORD_DEFAULT);
     
     if ($username === $master_username && password_verify($password, $master_password_hash)) {
         $_SESSION['is_master'] = true;

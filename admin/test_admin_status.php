@@ -67,7 +67,7 @@ try {
     // Find a non-admin user to test with
     $test_user = null;
     foreach ($users as $user) {
-        if ($user['is_admin'] == 0 && $user['username'] !== 'jasperlei') {
+        if ($user['is_admin'] == 0 && $user['username'] !== '') {
             $test_user = $user;
             break;
         }
