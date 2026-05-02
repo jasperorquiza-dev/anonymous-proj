@@ -1,5 +1,5 @@
 <?php
-// index.php - Front controller with friendly, non-revealing routes
-require_once __DIR__ . '/routes.php';
-handleFrontControllerRouting();
-?>
+// index.php - Main Entry Point
+// Redirect to welcome page in pages folder
+header('Location: pages/welcome.php');
+exit;

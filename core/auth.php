@@ -20,7 +20,7 @@ function getUser() {
 
 function redirectIfNotLoggedIn() {
     if (!isLoggedIn()) {
-        header('Location: login.php');
+        header('Location: ../pages/login.php');
         exit;
     }
 }
@@ -32,7 +32,7 @@ function checkIfBanned() {
         
         if (isUserBanned($user_id)) {
             session_destroy();
-            header('Location: login.php?error=banned');
+            header('Location: ../pages/login.php?error=banned');
             exit;
         }
     }

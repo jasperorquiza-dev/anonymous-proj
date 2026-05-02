@@ -21,7 +21,7 @@ if (!empty(MASTER_USERNAME) && $username === MASTER_USERNAME && !empty(MASTER_PA
     exit;
 } else {
     // Invalid credentials - redirect back to maintenance page
-    header('Location: welcome.php');
+    header('Location: ../pages/welcome.php');
     exit;
 }
 ?>

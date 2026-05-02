@@ -5,9 +5,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once 'core/database_connection.php';
-require_once 'admin/admin_functions.php';
-require_once 'core/maintenance_check.php';
+require_once '../core/database_connection.php';
+require_once '../admin/admin_functions.php';
+require_once '../core/maintenance_check.php';
 
 // Check if user is already logged in
 if (isset($_SESSION['user_id'])) {
@@ -37,9 +37,9 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;">
     <meta name="theme-color" content="#001489">
     
-    <link rel="icon" type="image/png" href="assets/img/assets/img/favicon.png">
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <?php include 'system_messages.php'; ?>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <?php include '../core/system_messages.php'; ?>
     <style>
         /* Navigation removed - no padding needed */
         .forum-container { padding-top: 20px; }
@@ -505,7 +505,7 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
         </div>
     </div>
 
-    <script src="assets/js/forum.js"></script>
+    <script src="../assets/js/forum.js"></script>
     <script>
         // Load messages immediately when page loads
         async function loadDashboardMessages() {
@@ -513,7 +513,7 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             if (!messagesContainer) return;
             
             try {
-                const response = await fetch('ajax/load_messages.php');
+                const response = await fetch('../ajax/load_messages.php');
                 const data = await response.json();
                 
                 if (data.status === 'success' && data.messages && data.messages.length > 0) {
@@ -650,7 +650,7 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             submitBtn.textContent = 'Logging in...';
             
             try {
-                const response = await fetch('ajax/ajax_login.php', {
+                const response = await fetch('../ajax/ajax_login.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -691,7 +691,7 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             submitBtn.textContent = 'Registering...';
             
             try {
-                const response = await fetch('ajax/ajax_register.php', {
+                const response = await fetch('../ajax/ajax_register.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -741,7 +741,7 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             startLivePreview();
             
             // Update online status
-            fetch('ajax/update_online_status.php');
+            fetch('../ajax/update_online_status.php');
         });
     </script>
 </body>

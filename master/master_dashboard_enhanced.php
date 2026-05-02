@@ -9,7 +9,7 @@ require_once '../admin/admin_functions.php';
 require_once 'philippines_time.php';
 
 if (!isMaster()) {
-    header('Location: messages.php');
+    header('Location: ../pages/messages.php');
     exit;
 }
 
@@ -28,7 +28,7 @@ $forum_settings = getForumSettings();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enhanced Master Dashboard</title>
-    <link rel="icon" type="image/png" href="assets/img/favicon.png">
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
     <link rel="stylesheet" href="../assets/css/styles.css">
     <style>
         :root {
@@ -1394,7 +1394,7 @@ $forum_settings = getForumSettings();
         }
 
         function refreshActivity() {
-            fetch('ajax_get_activity.php')
+            fetch('../ajax/ajax_get_activity.php')
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -1404,7 +1404,7 @@ $forum_settings = getForumSettings();
         }
 
         function refreshReports() {
-            fetch('ajax_get_reports.php')
+            fetch('../ajax/ajax_get_reports.php')
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -1414,7 +1414,7 @@ $forum_settings = getForumSettings();
         }
 
         function refreshUsers() {
-            fetch('ajax_get_users.php')
+            fetch('../ajax/ajax_get_users.php')
                 .then(response => response.json())
                 .then(data => {
                     if (data.status !== 'success') return;
@@ -1467,7 +1467,7 @@ $forum_settings = getForumSettings();
             const form = document.getElementById('settingsForm');
             const formData = new FormData(form);
             
-            fetch('ajax_save_settings.php', {
+            fetch('../ajax/ajax_save_settings.php', {
                 method: 'POST',
                 body: formData
             })
@@ -1496,7 +1496,7 @@ $forum_settings = getForumSettings();
                     const formData = new FormData();
                     formData.append('backup_file', file);
                     
-                    fetch('ajax_restore_backup.php', {
+                    fetch('../ajax/ajax_restore_backup.php', {
                         method: 'POST',
                         body: formData
                     })
@@ -1545,7 +1545,7 @@ $forum_settings = getForumSettings();
             form.append('type', type);
             form.append('duration', duration);
 
-            fetch('ajax_broadcast_message.php', {
+            fetch('../ajax/ajax_broadcast_message.php', {
                 method: 'POST',
                 body: form
             })
@@ -1695,7 +1695,7 @@ $forum_settings = getForumSettings();
         });
 
         function loadAnalytics() {
-            fetch('ajax_get_analytics.php')
+            fetch('../ajax/ajax_get_analytics.php')
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -1734,7 +1734,7 @@ $forum_settings = getForumSettings();
         }
 
         function loadAccessLogs() {
-            fetch('ajax_get_access_logs.php')
+            fetch('../ajax/ajax_get_access_logs.php')
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {

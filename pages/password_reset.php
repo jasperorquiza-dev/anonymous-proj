@@ -4,9 +4,9 @@
  * Allows users to reset forgotten passwords
  */
 
-require_once 'core/database_connection.php';
-require_once 'core/logger.php';
-require_once 'core/rate_limiter.php';
+require_once '../core/database_connection.php';
+require_once '../core/logger.php';
+require_once '../core/rate_limiter.php';
 
 class PasswordReset {
     

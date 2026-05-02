@@ -4,11 +4,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once 'core/auth.php';
-require_once 'core/database_connection.php';
-require_once 'admin/admin_functions.php';
-require_once 'core/maintenance_check.php';
-require_once 'master/master_auth.php';
+require_once '../core/auth.php';
+require_once '../core/database_connection.php';
+require_once '../admin/admin_functions.php';
+require_once '../core/maintenance_check.php';
+require_once '../master/master_auth.php';
 
 // Check if user is logged in, if not redirect to login
 if (!isset($_SESSION['user_id'])) {
@@ -64,9 +64,9 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($forum_title); ?> - Welcome <?php echo htmlspecialchars($user_name); ?></title>
-    <link rel="icon" type="image/png" href="assets/img/assets/img/favicon.png">
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <?php include 'system_messages.php'; ?>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <?php include '../core/system_messages.php'; ?>
     <style>
         /* TOP NAVIGATION FOR LOGGED IN USERS */
         .top-nav-buttons {
@@ -564,7 +564,7 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
         </div>
     </div>
 
-    <script src="assets/js/forum.js"></script>
+    <script src="../assets/js/forum.js"></script>
     <script>
         // Delete message function for admin
         function deleteMessage(messageId) {
@@ -572,7 +572,7 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
                 const formData = new FormData();
                 formData.append('message_id', messageId);
                 
-                fetch('ajax_delete_message.php', {
+                fetch('../ajax/ajax_delete_message.php', {
                     method: 'POST',
                     body: formData
                 })
@@ -642,7 +642,7 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
             initScrollEffects();
             
             // Update online status
-            fetch('ajax/update_online_status.php');
+            fetch('../ajax/update_online_status.php');
         });
     </script>
 </body>

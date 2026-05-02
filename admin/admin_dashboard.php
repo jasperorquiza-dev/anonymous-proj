@@ -15,7 +15,7 @@ if (isMaster()) {
     exit;
 }
 if (!isAdmin()) {
-    header('Location: messages.php');
+    header('Location: ../pages/messages.php');
     exit;
 }
 
@@ -29,7 +29,7 @@ $messages = getAllMessages();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - ICCT Forum</title>
-    <link rel="icon" type="image/png" href="assets/img/favicon.png">
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
     <link rel="stylesheet" href="../assets/css/styles.css">
     <style>
         /* Enhanced Admin Header */
@@ -687,7 +687,7 @@ $messages = getAllMessages();
                 formData.append('message_ids[]', id);
             });
             
-            fetch('ajax_delete_multiple_messages.php', {
+            fetch('../ajax/ajax_delete_multiple_messages.php', {
                 method: 'POST',
                 body: formData
             })
@@ -725,7 +725,7 @@ $messages = getAllMessages();
             formData.append('user_id', userId);
             if (duration) formData.append('duration', duration);
             
-            fetch('ajax_ban_user.php', {
+            fetch('../ajax/ajax_ban_user.php', {
                 method: 'POST',
                 body: formData
             })
@@ -748,7 +748,7 @@ $messages = getAllMessages();
                 const formData = new FormData();
                 formData.append('user_id', userId);
                 
-                fetch('ajax_unban_user.php', {
+                fetch('../ajax/ajax_unban_user.php', {
                     method: 'POST',
                     body: formData
                 })
@@ -772,7 +772,7 @@ $messages = getAllMessages();
                 const formData = new FormData();
                 formData.append('user_id', userId);
                 
-                fetch('ajax_mute_user.php', {
+                fetch('../ajax/ajax_mute_user.php', {
                     method: 'POST',
                     body: formData
                 })
@@ -796,7 +796,7 @@ $messages = getAllMessages();
                 const formData = new FormData();
                 formData.append('user_id', userId);
                 
-                fetch('ajax_unmute_user.php', {
+                fetch('../ajax/ajax_unmute_user.php', {
                     method: 'POST',
                     body: formData
                 })
@@ -820,7 +820,7 @@ $messages = getAllMessages();
                 const formData = new FormData();
                 formData.append('user_id', userId);
                 
-                fetch('ajax_delete_user.php', {
+                fetch('../ajax/ajax_delete_user.php', {
                     method: 'POST',
                     body: formData
                 })

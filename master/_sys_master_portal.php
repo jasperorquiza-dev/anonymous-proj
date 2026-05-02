@@ -9,7 +9,7 @@ require_once '../admin/admin_functions.php';
 // Handle logout
 if (isset($_GET['logout'])) {
     unset($_SESSION['is_master']);
-    header('Location: welcome.php');
+    header('Location: ../pages/welcome.php');
     exit;
 }
 

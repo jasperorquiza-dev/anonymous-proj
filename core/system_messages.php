@@ -132,7 +132,7 @@ $system_messages = getActiveSystemMessages();
 
 <script>
 function dismissSystemMessage(messageId) {
-    fetch('ajax_dismiss_system_message.php', {
+    fetch('ajax/ajax_dismiss_system_message.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
