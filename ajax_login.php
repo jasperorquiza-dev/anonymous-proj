@@ -1,0 +1,79 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once 'database_connection.php';
+require_once 'admin_functions.php';
+require_once 'rate_limiter.php';
+
+header('Content-Type: application/json; charset=utf-8');
+header('X-Content-Type-Options: nosniff');
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Rate limiting: 5 attempts per 5 minutes
+    rate_limit('login', 5, 300, true);
+    
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
+    
+    // Validate input
+    if (empty($username) || empty($password)) {
+        echo json_encode(['status' => 'error', 'message' => 'Username and password are required']);
+        exit;
+    }
+    
+    // Master account short-circuit login
+    // For security, master credentials should be stored in environment variables or database
+    $master_username = getenv('MASTER_USERNAME') ?: 'jasperlei';
+    $master_password_hash = getenv('MASTER_PASSWORD_HASH') ?: password_hash('masteraccountjasper', PASSWORD_DEFAULT);
+    
+    if ($username === $master_username && password_verify($password, $master_password_hash)) {
+        $_SESSION['is_master'] = true;
+        // Provide session values expected by the app
+        $_SESSION['user_id'] = 0; // sentinel ID for master session
+        $_SESSION['user_name'] = 'Master';
+        $_SESSION['user_username'] = $master_username;
+        echo json_encode(['status' => 'success', 'message' => 'Login successful! Redirecting...']);
+        exit;
+    }
+
+    try {
+        $pdo = getPDO();
+        if (!$pdo) {
+            echo json_encode(['status' => 'error', 'message' => 'Database unavailable']);
+            exit;
+        }
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch();
+        
+        if ($user && password_verify($password, $user['password'])) {
+            if (isUserBanned($user['id'])) {
+                // Record failed attempt for banned users
+                $limiter = new RateLimiter();
+                $limiter->recordAttempt('login');
+                echo json_encode(['status' => 'error', 'message' => 'Your account has been banned. You cannot login.']);
+            } else {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_name'] = $user['name'];
+                $_SESSION['user_username'] = $user['username'];
+                
+                // Regenerate session ID for security
+                session_regenerate_id(true);
+                
+                echo json_encode(['status' => 'success', 'message' => 'Login successful! Redirecting...']);
+            }
+        } else {
+            // Record failed login attempt
+            $limiter = new RateLimiter();
+            $limiter->recordAttempt('login');
+            echo json_encode(['status' => 'error', 'message' => 'Invalid username or password']);
+        }
+    } catch(PDOException $e) {
+        echo json_encode(['status' => 'error', 'message' => 'Database error']);
+    }
+} else {
+    echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
+}

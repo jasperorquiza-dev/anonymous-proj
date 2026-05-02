@@ -1,0 +1,7 @@
+Contact: mailto:admin@icct-forumjoo.fwh.is
+Expires: 2026-12-31T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://icct-forumjoo.fwh.is/.well-known/security.txt
+
+# This is a legitimate educational forum for ICCT students
+# If you have security concerns, please contact us

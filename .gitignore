@@ -1,0 +1,17 @@
+# Logs
+logs/*.log
+logs/*.txt
+
+# Backups
+backups/
+
+# Database Migration History (contains data)
+database_migrations.php
+
+# Environment variables
+.env
+
+# XAMPP/OS specific
+Thumb.db
+.DS_Store
+error_log

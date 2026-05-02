@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Sitemap: https://icct-forumjoo.fwh.is/sitemap.xml
+
+# Disallow sensitive directories
+Disallow: /admin
+Disallow: /config.php
+Disallow: /database_connection.php
+Disallow: /backups/
+Disallow: /logs/
+Disallow: /error/
+
+# Allow public assets
+Allow: /styles.css
+Allow: /forum.js
+Allow: /favicon.png
