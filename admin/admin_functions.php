@@ -163,146 +163,7 @@ function setAdminStatus($user_id, $is_admin) {
         return false;
     }
 }
-function getAllMessages() {
-    if (!isPrivileged()) return [];
-    try {
-        $pdo = getPDO();
-        if (!$pdo) return false;
-        $stmt = $pdo->query("SELECT id, user_id, username, message, created_at FROM messages ORDER BY created_at ASC LIMIT 100");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch(PDOException $e) {
-        return [];
-    }
-}
-function isUserBanned($user_id) {
-    try {
-        $pdo = getPDO();
-        $stmt = $pdo->prepare("SELECT is_banned, banned_until FROM users WHERE id = ?");
-        $stmt->execute([$user_id]);
-        $user = $stmt->fetch();
-        if (!$user) return false;
-        if ($user['is_banned'] == 1 && empty($user['banned_until'])) return true;
-        if ($user['is_banned'] == 1 && $user['banned_until'] && strtotime($user['banned_until']) > time()) return true;
-        if ($user['is_banned'] == 1 && $user['banned_until'] && strtotime($user['banned_until']) <= time()) {
-            unbanUser($user_id);
-            return false;
-        }
-        return false;
-    } catch(PDOException $e) {
-        return false;
-    }
-}
-function isUserMuted($user_id) {
-    try {
-        $pdo = getPDO();
-        $stmt = $pdo->prepare("SELECT is_muted, muted_until FROM users WHERE id = ?");
-        $stmt->execute([$user_id]);
-        $user = $stmt->fetch();
-        if (!$user) return false;
-        if ($user['is_muted'] == 1 && $user['muted_until'] && strtotime($user['muted_until']) > time()) return true;
-        if ($user['is_muted'] == 1 && $user['muted_until'] && strtotime($user['muted_until']) <= time()) {
-            unmuteUser($user_id);
-            return false;
-        }
-        return false;
-    } catch(PDOException $e) {
-        return false;
-    }
-}
-function getRecentActivity($limit = 50) {
-    if (!isPrivileged()) return [];
-    try {
-        $pdo = getPDO();
-        if (!$pdo) return [];
-        $pdo->exec("
-            CREATE TABLE IF NOT EXISTS activity_logs (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                action VARCHAR(100) NOT NULL,
-                target_id VARCHAR(50),
-                username VARCHAR(100),
-                details TEXT,
-                ip_address VARCHAR(45),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ");
-        $stmt = $pdo->prepare("SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT ?");
-        $stmt->execute([$limit]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch(PDOException $e) {
-        return [];
-    }
-}
-function getAdminActions($limit = 50) {
-    if (!isPrivileged()) return [];
-    try {
-        $pdo = getPDO();
-        if (!$pdo) return [];
-        $stmt = $pdo->prepare("SELECT * FROM activity_logs WHERE action LIKE '%admin%' OR action LIKE '%ban%' OR action LIKE '%mute%' ORDER BY created_at DESC LIMIT ?");
-        $stmt->execute([$limit]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch(PDOException $e) {
-        return [];
-    }
-}
-function getReports($limit = 50) {
-    if (!isPrivileged()) return [];
-    try {
-        $pdo = getPDO();
-        if (!$pdo) return [];
-        $pdo->exec("
-            CREATE TABLE IF NOT EXISTS reports (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                type VARCHAR(50) NOT NULL,
-                reporter_id VARCHAR(50),
-                reporter VARCHAR(100),
-                target_id VARCHAR(50),
-                target VARCHAR(100),
-                reason TEXT,
-                status ENUM('pending', 'resolved', 'dismissed') DEFAULT 'pending',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                resolved_at TIMESTAMP NULL,
-                resolved_by VARCHAR(50)
-            )
-        ");
-        $stmt = $pdo->prepare("SELECT * FROM reports ORDER BY created_at DESC LIMIT ?");
-        $stmt->execute([$limit]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch(PDOException $e) {
-        return [];
-    }
-}
-function getForumSettings() {
-    if (!isPrivileged()) return [];
-    try {
-        $pdo = getPDO();
-        if (!$pdo) return [];
-        $pdo->exec("
-            CREATE TABLE IF NOT EXISTS forum_settings (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                setting_key VARCHAR(100) UNIQUE NOT NULL,
-                setting_value TEXT,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            )
-        ");
-        $stmt = $pdo->query("SELECT setting_key, setting_value FROM forum_settings");
-        $settings = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $settings[$row['setting_key']] = $row['setting_value'];
-        }
-        if (!isset($settings['live_preview_enabled'])) {
-            $settings['live_preview_enabled'] = '1';
-        }
-        if (!isset($settings['forum_title'])) {
-            $settings['forum_title'] = 'ICCT Forum';
-        }
-        if (!isset($settings['forum_logo'])) {
-            $settings['forum_logo'] = 'assets/img/icct.jpg';
-        }
-        return $settings;
-    } catch(PDOException $e) {
-        return [];
-    }
-}
+
 function saveSetting($key, $value) {
     if (!isMaster()) return false;
     try {
@@ -588,6 +449,7 @@ function getAllMessages($limit = 100) {
         return [];
     }
 }
+
 function isUserBanned($user_id) {
     try {
         $pdo = getPDO();
@@ -596,13 +458,18 @@ function isUserBanned($user_id) {
         $stmt->execute([$user_id]);
         $user = $stmt->fetch();
         if (!$user) return false;
-        if ($user['is_banned'] == 1) return true;
-        if ($user['banned_until'] && strtotime($user['banned_until']) > time()) return true;
+        if ($user['is_banned'] == 1 && empty($user['banned_until'])) return true;
+        if ($user['is_banned'] == 1 && $user['banned_until'] && strtotime($user['banned_until']) > time()) return true;
+        if ($user['is_banned'] == 1 && $user['banned_until'] && strtotime($user['banned_until']) <= time()) {
+            unbanUser($user_id);
+            return false;
+        }
         return false;
     } catch(PDOException $e) {
         return false;
     }
 }
+
 function getRecentActivity($limit = 20) {
     if (!isPrivileged()) return [];
     try {
@@ -623,21 +490,60 @@ function getRecentActivity($limit = 20) {
         return [];
     }
 }
+
 function getAdminActions($limit = 20) {
     if (!isPrivileged()) return [];
-    return [];
+    try {
+        $pdo = getPDO();
+        if (!$pdo) return [];
+        $stmt = $pdo->prepare("SELECT * FROM activity_logs WHERE action LIKE '%admin%' OR action LIKE '%ban%' OR action LIKE '%mute%' ORDER BY created_at DESC LIMIT ?");
+        $stmt->execute([$limit]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch(PDOException $e) {
+        return [];
+    }
 }
+
 function getReports($limit = 20) {
     if (!isPrivileged()) return [];
-    return [];
+    try {
+        $pdo = getPDO();
+        if (!$pdo) return [];
+        $stmt = $pdo->prepare("SELECT * FROM reports ORDER BY created_at DESC LIMIT ?");
+        $stmt->execute([$limit]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch(PDOException $e) {
+        return [];
+    }
 }
+
 function getForumSettings() {
-    return [
-        'forum_title' => 'ICCT Anonymous Forum',
-        'forum_logo' => '../assets/img/icct.jpg',
-        'max_message_length' => 500,
-        'maintenance_mode' => 0
-    ];
+
+    if (!isPrivileged()) return [];
+    try {
+        $pdo = getPDO();
+        if (!$pdo) return [];
+        $stmt = $pdo->query("SELECT setting_key, setting_value FROM forum_settings");
+        $settings = [];
+        if ($stmt) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $settings[$row['setting_key']] = $row['setting_value'];
+            }
+        }
+        return array_merge([
+            'forum_title' => 'ICCT Anonymous Forum',
+            'forum_logo' => '../assets/img/icct.jpg',
+            'max_message_length' => 500,
+            'maintenance_mode' => 0
+        ], $settings);
+    } catch(PDOException $e) {
+        return [
+            'forum_title' => 'ICCT Anonymous Forum',
+            'forum_logo' => '../assets/img/icct.jpg',
+            'max_message_length' => 500,
+            'maintenance_mode' => 0
+        ];
+    }
 }
 function initializeUserProfiles() {
     try {
