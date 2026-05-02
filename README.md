@@ -1,4 +1,4 @@
-# 🎭 Anonymous Forum System
+# Anonymous Forum System
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=googledrive&logoColor=white)](https://icct-forumjoo.fwh.is/)
 [![PHP Version](https://img.shields.io/badge/PHP-7.4+-blue?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
@@ -8,23 +8,23 @@ A professional, secure, and highly organized anonymous discussion platform desig
 
 ---
 
-## 🚀 Live Demo
+## Live Demo
 Experience the system live here: **[https://icct-forumjoo.fwh.is/](https://icct-forumjoo.fwh.is/)**
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-*   **🔒 Complete Anonymity**: User identities are protected with generated anonymous handles.
-*   **🛡️ Robust Administration**: Multi-tier admin system (Admin & Master) with moderation tools.
-*   **⚡ Real-time Discussions**: AJAX-powered live feed for seamless communication.
-*   **🌗 Dynamic Theming**: Built-in dark mode and light mode support.
-*   **📊 Advanced Analytics**: Detailed statistics dashboard for administrators.
-*   **🧱 Modular Architecture**: Clean, folder-based structure for maximum maintainability.
+*   **Complete Anonymity**: User identities are protected with generated anonymous handles.
+*   **Robust Administration**: Multi-tier admin system (Admin & Master) with moderation tools.
+*   **Real-time Discussions**: AJAX-powered live feed for seamless communication.
+*   **Dynamic Theming**: Built-in dark mode and light mode support.
+*   **Advanced Analytics**: Detailed statistics dashboard for administrators.
+*   **Modular Architecture**: Clean, folder-based structure for maximum maintainability.
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 The project follows a modern modular directory layout:
 
@@ -41,7 +41,7 @@ The project follows a modern modular directory layout:
 
 ---
 
-## 🛠️ Installation & Setup
+## Installation & Setup
 
 1.  **Clone the Repository**:
     ```bash
@@ -62,16 +62,16 @@ The project follows a modern modular directory layout:
 
 ---
 
-## 🔒 Security Notice
+## Security Notice
 
 This repository has been **sanitized**. No hardcoded credentials or sensitive session data are stored in the codebase. All security-critical configurations are handled via environment variables or encrypted database storage.
 
 ---
 
-## 🤝 Contribution
+## Contribution
 
 Feel free to fork this project and submit pull requests. For major changes, please open an issue first to discuss what you would like to change.
 
 ---
 
-*Developed with ❤️ by [Jasper Orquiza](https://github.com/jasperorquiza-dev)*
+*Developed by [Jasper Orquiza](https://github.com/jasperorquiza-dev)*
