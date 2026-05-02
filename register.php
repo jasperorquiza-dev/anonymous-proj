@@ -11,7 +11,7 @@ header('Location: messages.php');
 }
 
 // Include database connection
-require_once 'database_connection.php';
+require_once 'core/database_connection.php';
 
 $error = '';
 $success = '';
@@ -64,8 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - ICCT Forum</title>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="assets/img/assets/img/favicon.png">
+    <link rel="stylesheet" href="assets/css/styles.css">
     <style>
         .auth-container {
             max-width: 450px;

@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once 'database_connection.php';
+require_once 'core/database_connection.php';
 
 // Capture user id before destroying session
 $userId = $_SESSION['user_id'] ?? null;

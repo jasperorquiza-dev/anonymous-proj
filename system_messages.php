@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once 'admin_functions.php';
+require_once 'admin/admin_functions.php';
 
 function getActiveSystemMessages() {
     try {

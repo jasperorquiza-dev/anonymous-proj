@@ -4,11 +4,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once 'auth.php';
-require_once 'database_connection.php';
-require_once 'admin_functions.php';
-require_once 'maintenance_check.php';
-require_once 'master_auth.php';
+require_once 'core/auth.php';
+require_once 'core/database_connection.php';
+require_once 'admin/admin_functions.php';
+require_once 'core/maintenance_check.php';
+require_once 'master/master_auth.php';
 
 // Check if user is logged in, if not redirect to login
 if (!isset($_SESSION['user_id'])) {
@@ -56,7 +56,7 @@ try {
 // Get forum settings
 $forum_settings = getForumSettings();
 $forum_title = $forum_settings['forum_title'] ?? 'ICCT Forum';
-$forum_logo = $forum_settings['forum_logo'] ?? 'icct.jpg';
+$forum_logo = $forum_settings['forum_logo'] ?? 'assets/img/icct.jpg';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -64,8 +64,8 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'icct.jpg';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($forum_title); ?> - Welcome <?php echo htmlspecialchars($user_name); ?></title>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="assets/img/assets/img/favicon.png">
+    <link rel="stylesheet" href="assets/css/styles.css">
     <?php include 'system_messages.php'; ?>
     <style>
         /* TOP NAVIGATION FOR LOGGED IN USERS */
@@ -564,7 +564,7 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'icct.jpg';
         </div>
     </div>
 
-    <script src="forum.js"></script>
+    <script src="assets/js/forum.js"></script>
     <script>
         // Delete message function for admin
         function deleteMessage(messageId) {
@@ -642,7 +642,7 @@ $forum_logo = $forum_settings['forum_logo'] ?? 'icct.jpg';
             initScrollEffects();
             
             // Update online status
-            fetch('update_online_status.php');
+            fetch('ajax/update_online_status.php');
         });
     </script>
 </body>
